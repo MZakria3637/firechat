@@ -1,34 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { db } from '../firbase';
+import React, { useState, useEffect, useRef } from 'react'
+import { db, auth } from '../firbase'
+import SendMessages from './SendMessages'
 import SignOut from './SignOut'
-const Items = ({ messages }) => {
-    const newlist = messages.map((doc, index) => {
-        return (
-            <p
-                key={index}
-            >
-                {doc.data()?.id} - {doc.data()?.text}
-            </p>
-        );
-    })
-    return (<div className="test">
-        {newlist}
-    </div>);
-}
-function Chat() {
-    const [messages, setmessages] = useState([]);
-    useEffect(() => {
-        db.collection("messages").get().then((col) =>
-            setmessages(col.docs)
-        )
-    }, []);
 
+function Chat() {
+    
+    const scroll = useRef()
+    //scroll.current.scrollIntoView({ behavior: 'smooth' })
+    const [messages, setMessages] = useState([])
+    useEffect(() => {
+        db.collection('messages').orderBy('createdAt').limit(10000).onSnapshot(snapshot => {
+            setMessages(snapshot.docs.map(doc => doc.data()))
+        })
+    }, [])
     return (
-        <>
+        <div>
             <SignOut />
-            <h1>Hello world</h1>
-            <Items messages={messages} />
-        </>
+            <div className="msgs">
+                {messages.map(({ id, text, photoURL, uid }) => (
+                    <div>
+                        <div key={id} className={`msg ${uid === auth.currentUser.uid ? 'sent' : 'received'}`}>
+                            <img src={photoURL} alt="" />
+                            <p>{text}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <SendMessages scroll={scroll} />
+            <div ref={scroll}></div>
+        </div>
     )
 }
 

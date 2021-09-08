@@ -1,5 +1,5 @@
 import firebase from "firebase";
-const firebaseApp = firebase.initializeApp({
+firebase.initializeApp({
     apiKey: "AIzaSyAPk9tMxwDa05Mm08gGGfM2WYmARlp5zGo",
     authDomain: "firechat-cb150.firebaseapp.com",
     projectId: "firechat-cb150",
